@@ -1,0 +1,250 @@
+{
+  "chelyabinsk": {
+    "region": "Челябинская область",
+    "ballotsIssued": 279263,
+    "voters": 368348,
+    "turnout": 75.81,
+    "invalidBallots": 0,
+    "validBallots": 279263
+  },
+  "rostov": {
+    "region": "Ростовская область",
+    "ballotsIssued": 76,
+    "voters": 102,
+    "turnout": 74.51,
+    "invalidBallots": 0,
+    "validBallots": 76
+  },
+  "sverdlovsk": {
+    "region": "Свердловская область",
+    "ballotsIssued": 452177,
+    "voters": 561735,
+    "turnout": 80.5,
+    "invalidBallots": 0,
+    "validBallots": 452177
+  },
+  "novosibirsk": {
+    "region": "Новосибирская область",
+    "ballotsIssued": 1651,
+    "voters": 2078,
+    "turnout": 79.45,
+    "invalidBallots": 0,
+    "validBallots": 1651
+  },
+  "kaliningrad": {
+    "region": "Калининградская область",
+    "ballotsIssued": 267,
+    "voters": 377,
+    "turnout": 70.82,
+    "invalidBallots": 0,
+    "validBallots": 267
+  },
+  "altai-krai": {
+    "region": "Алтайский край",
+    "ballotsIssued": 386381,
+    "voters": 480442,
+    "turnout": 80.42,
+    "invalidBallots": 0,
+    "validBallots": 386381
+  },
+  "belgorod": {
+    "region": "Белгородская область",
+    "ballotsIssued": 184106,
+    "voters": 240401,
+    "turnout": 76.58,
+    "invalidBallots": 0,
+    "validBallots": 184106
+  },
+  "arkhangelsk": {
+    "region": "Архангельская область",
+    "ballotsIssued": 126804,
+    "voters": 161810,
+    "turnout": 78.37,
+    "invalidBallots": 0,
+    "validBallots": 126804
+  },
+  "udmurt": {
+    "region": "Удмуртская Республика",
+    "ballotsIssued": 1552,
+    "voters": 1862,
+    "turnout": 83.35,
+    "invalidBallots": 0,
+    "validBallots": 1552
+  },
+  "mari-el": {
+    "region": "Республика Марий Эл",
+    "ballotsIssued": 126159,
+    "voters": 149384,
+    "turnout": 84.45,
+    "invalidBallots": 0,
+    "validBallots": 126159
+  },
+  "moscow-oblast": {
+    "region": "Московская область",
+    "ballotsIssued": 1183716,
+    "voters": 1464408,
+    "turnout": 80.83,
+    "invalidBallots": 0,
+    "validBallots": 1183716
+  },
+  "murmansk": {
+    "region": "Мурманская область",
+    "ballotsIssued": 67380,
+    "voters": 89358,
+    "turnout": 75.4,
+    "invalidBallots": 0,
+    "validBallots": 67380
+  },
+  "pskov": {
+    "region": "Псковская область",
+    "ballotsIssued": 83877,
+    "voters": 104625,
+    "turnout": 80.17,
+    "invalidBallots": 0,
+    "validBallots": 83877
+  },
+  "nizhny-novgorod": {
+    "region": "Нижегородская область",
+    "ballotsIssued": 201979,
+    "voters": 280772,
+    "turnout": 71.94,
+    "invalidBallots": 0,
+    "validBallots": 201979
+  },
+  "lipetsk": {
+    "region": "Липецкая область",
+    "ballotsIssued": 121760,
+    "voters": 152459,
+    "turnout": 79.86,
+    "invalidBallots": 0,
+    "validBallots": 121760
+  },
+  "yaroslavl": {
+    "region": "Ярославская область",
+    "ballotsIssued": 137442,
+    "voters": 171226,
+    "turnout": 80.27,
+    "invalidBallots": 0,
+    "validBallots": 137442
+  },
+  "kostroma": {
+    "region": "Костромская область",
+    "ballotsIssued": 57889,
+    "voters": 70616,
+    "turnout": 81.98,
+    "invalidBallots": 0,
+    "validBallots": 57889
+  },
+  "kaluga": {
+    "region": "Калужская область",
+    "ballotsIssued": 119513,
+    "voters": 152501,
+    "turnout": 78.37,
+    "invalidBallots": 0,
+    "validBallots": 119513
+  },
+  "novgorod": {
+    "region": "Новгородская область",
+    "ballotsIssued": 87349,
+    "voters": 101304,
+    "turnout": 86.22,
+    "invalidBallots": 0,
+    "validBallots": 87349
+  },
+  "smolensk": {
+    "region": "Смоленская область",
+    "ballotsIssued": 186329,
+    "voters": 219931,
+    "turnout": 84.72,
+    "invalidBallots": 0,
+    "validBallots": 186329
+  },
+  "vladimir": {
+    "region": "Владимирская область",
+    "ballotsIssued": 2920,
+    "voters": 3918,
+    "turnout": 74.53,
+    "invalidBallots": 0,
+    "validBallots": 2920
+  },
+  "tomsk": {
+    "region": "Томская область",
+    "ballotsIssued": 157879,
+    "voters": 194568,
+    "turnout": 81.14,
+    "invalidBallots": 0,
+    "validBallots": 157879
+  },
+  "vologda": {
+    "region": "Вологодская область",
+    "ballotsIssued": 79808,
+    "voters": 108484,
+    "turnout": 73.57,
+    "invalidBallots": 0,
+    "validBallots": 79808
+  },
+  "karelia": {
+    "region": "Республика Карелия",
+    "ballotsIssued": 25994,
+    "voters": 35278,
+    "turnout": 73.68,
+    "invalidBallots": 0,
+    "validBallots": 25994
+  },
+  "crimea": {
+    "region": "Республика Крым",
+    "ballotsIssued": 112123,
+    "voters": 150431,
+    "turnout": 74.53,
+    "invalidBallots": 0,
+    "validBallots": 112123
+  },
+  "perm-krai": {
+    "region": "Пермский край",
+    "ballotsIssued": 6040,
+    "voters": 7737,
+    "turnout": 78.07,
+    "invalidBallots": 0,
+    "validBallots": 6040
+  },
+  "komi": {
+    "region": "Республика Коми",
+    "ballotsIssued": 118717,
+    "voters": 153485,
+    "turnout": 77.35,
+    "invalidBallots": 0,
+    "validBallots": 118717
+  },
+  "altai-republic": {
+    "region": "Республика Алтай",
+    "ballotsIssued": 5400,
+    "voters": 6626,
+    "turnout": 81.5,
+    "invalidBallots": 0,
+    "validBallots": 5400
+  },
+  "kurgan": {
+    "region": "Курганская область",
+    "ballotsIssued": 53736,
+    "voters": 68820,
+    "turnout": 78.08,
+    "invalidBallots": 0,
+    "validBallots": 53736
+  },
+  "magadan": {
+    "region": "Магаданская область",
+    "ballotsIssued": 463,
+    "voters": 604,
+    "turnout": 76.66,
+    "invalidBallots": 0,
+    "validBallots": 463
+  },
+  "nenets": {
+    "region": "Ненецкий автономный округ",
+    "ballotsIssued": 4908,
+    "voters": 6498,
+    "turnout": 75.53,
+    "invalidBallots": 0,
+    "validBallots": 4908
+  }
+}
