@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadFeddegData();
     await loadRegionDetails();
     await loadSVGMap();
+
+    const closeButton = document.getElementById('sidebarClose');
+    if (closeButton) {
+        closeButton.addEventListener('click', closeSidebar);
+    }
+    const electionSelect = document.getElementById('electionSelect');
+    if (electionSelect) {
+        electionSelect.addEventListener('change', (event) => onElectionChange(event.target.value));
+    }
 });
 
 async function loadFeddegData() {
@@ -53,6 +62,18 @@ function getRegionVotes(regionId) {
     if (!feddegData) return 0;
     const region = feddegData.regions.find(r => r.id === regionId);
     return region?.votes || 0;
+}
+
+function getRegionRemoved(regionId) {
+    if (!feddegData) return 0;
+    const region = feddegData.regions.find(r => r.id === regionId);
+    return region?.removed_voters || 0;
+}
+
+function getRegionRemovedSeries(regionId) {
+    if (!feddegData) return null;
+    const region = feddegData.regions.find(r => r.id === regionId);
+    return region?.removedSeries || null;
 }
 
 function getRegionElections(regionId) {
@@ -132,6 +153,7 @@ function renderSidebarCharts() {
     // Try to get district-specific series, fallback to region series
     const district = getDistrictByRegionAndElection(currentRegion, currentElection);
     const series = district?.series || region.series;
+    const removedSeries = district?.removedSeries || region.removedSeries || null;
     if (!series) return;
     
     const timelineStart = feddegData.timeline?.start || '2026-09-17 22:00';
@@ -152,12 +174,17 @@ function renderSidebarCharts() {
             <div class="chart-title">Скачки и просадки</div>
             <div id="chartAnomaly" style="min-height:220px"></div>
         </div>
+        <div class="chart-wrapper">
+            <div class="chart-title">Исключения из списков</div>
+            <div id="chartRemoved" style="min-height:220px"></div>
+        </div>
     `;
     
     setTimeout(() => {
         mountChart(document.getElementById('chartCumulative'), series, bucketMinutes, timelineStart, view);
         mountActivityChart(document.getElementById('chartActivity'), series, bucketMinutes, timelineStart, view);
         mountAnomalyChart(document.getElementById('chartAnomaly'), series, bucketMinutes, timelineStart, view);
+        mountRemovedChart(document.getElementById('chartRemoved'), removedSeries, bucketMinutes, timelineStart, view);
     }, 0);
 }
 
@@ -479,6 +506,7 @@ function showTooltip(event, regionId, regionName, regionType, ruCode) {
     const feddegBallots = getRegionBallots(regionId);
     const feddegVotes = getRegionVotes(regionId);
     const feddegVoters = getRegionVoters(regionId);
+    const feddegRemoved = getRegionRemoved(regionId);
     const turnout = feddegVoters > 0 ? (feddegVotes / feddegVoters * 100).toFixed(1) : '—';
     
     html += `
@@ -486,6 +514,7 @@ function showTooltip(event, regionId, regionName, regionType, ruCode) {
         <div class="stat-row"><span>Бюллетени:</span><span>${number(feddegBallots)}</span></div>
         <div class="stat-row"><span>Голоса:</span><span>${number(feddegVotes)}</span></div>
         <div class="stat-row"><span>Избирателей:</span><span>${number(feddegVoters)}</span></div>
+        <div class="stat-row"><span>Исключено из списков:</span><span>${number(feddegRemoved)}</span></div>
         <div class="stat-row"><span>Явка:</span><span>${turnout}%</span></div>
     </div>
     `;
@@ -526,7 +555,7 @@ const formatDecimal = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 
 const formatSigned = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1, signDisplay: 'exceptZero' });
 
 function number(value) { return formatNumber.format(value || 0); }
-function escapeHtml(value) { return String(value).replaceAll('&', '&').replaceAll('<', '<').replaceAll('>', '>').replaceAll('"', '"').replaceAll("'", '&#039;'); }
+function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;'); }
 
 function formatBucket(offset, timelineStart) {
     const [date, time] = timelineStart.split(' ');
@@ -731,6 +760,43 @@ function mountAnomalyChart(container, series, bucketMinutes, timelineStart, view
     attachChartInteractions({ container, view, width, margin, innerWidth, xSpan, nearest: o => points.reduce((b, p) => Math.abs(p.offset - o) < Math.abs(b.offset - o) ? p : b, points[0]), pointX: p => chart.x(p.offset), tooltipContent: p => { const rel = p.ratio >= 1 ? `в ${formatDecimal.format(p.ratio)} раза от обычного` : `${formatPercent.format(p.ratio * 100)}% от обычного`; return `<strong>${formatBucket(p.offset, timelineStart)}</strong><br>Бюллетени за интервал: ${number(p.ballots)}<br>Обычный интервал: ${number(Math.round(p.baseline))}<br>Отклонение: ${formatSigned.format(p.deviation)}× (${rel})`; } });
 }
 
+function mountRemovedChart(container, removedSeries, bucketMinutes, timelineStart, view) {
+    const empty = () => {
+        container.innerHTML = '<div style="color:#888;text-align:center;padding:1rem;font-size:0.8rem">Нет данных об исключениях</div>';
+    };
+    if (!container || !removedSeries || removedSeries.length < 2) { if (container) empty(); return; }
+    const width = 980, height = 300;
+    const margin = { top: 16, right: 24, bottom: 42, left: 72 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const xSpan = Math.max(view.xEnd - view.xStart, bucketMinutes, 1);
+    const visible = removedSeries.filter(p => p[0] >= view.xStart && p[0] <= view.xEnd);
+    if (visible.length < 2) { empty(); return; }
+    const yMax = niceCeil(Math.max(...visible.map(p => p[1]), 1) / view.yZoom);
+    const chart = { x: v => margin.left + ((v - view.xStart) / xSpan) * innerWidth, y: v => margin.top + innerHeight - (v / yMax) * innerHeight };
+    const yTicks = valueTicks(0, yMax, 4);
+    const yStep = yTicks.length > 1 ? yTicks[1] - yTicks[0] : yMax;
+    const xTicks = xTickList(view.xStart, xSpan);
+    const path = visible.map((p, i) => `${i === 0 ? 'M' : 'L'}${chart.x(p[0]).toFixed(2)},${chart.y(p[1]).toFixed(2)}`).join(' ');
+
+    container.innerHTML = `
+        <div class="chart-scroller" style="overflow-x:auto;height:${height}px">
+            <svg class="chart" viewBox="0 0 ${width} ${height}" role="img" style="width:${width}px;height:${height}px">
+                ${yTicks.map(t => `<line class="grid-line" x1="${margin.left}" y1="${chart.y(t)}" x2="${width - margin.right}" y2="${chart.y(t)}" style="stroke:rgba(255,255,255,0.05)"/><text class="tick-label" x="${margin.left - 10}" y="${chart.y(t) + 4}" text-anchor="end" style="fill:#666;font-size:10px">${formatTick(t, yStep)}</text>`).join('')}
+                ${xTicks.map(t => `<line class="grid-line" x1="${chart.x(t.value)}" y1="${margin.top}" x2="${chart.x(t.value)}" y2="${height - margin.bottom}" style="stroke:rgba(255,255,255,0.05)"/><text class="tick-label" x="${chart.x(t.value)}" y="${height - 14}" text-anchor="${t.anchor}" style="fill:#666;font-size:10px">${formatBucket(Math.round(t.value), timelineStart)}</text>`).join('')}
+                <line class="axis-line" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" style="stroke:#444"/>
+                <line class="axis-line" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" style="stroke:#444"/>
+                <path class="series-removed" d="${path}" style="fill:none;stroke:var(--red);stroke-width:2"/>
+                <line class="hover-line" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" style="stroke:#fff;stroke-dasharray:4,4;opacity:0;pointer-events:none"/>
+                <rect class="chart-hitbox" x="${margin.left}" y="${margin.top}" width="${innerWidth}" height="${innerHeight}" fill="transparent" style="cursor:crosshair"/>
+            </svg>
+        </div>
+        <div class="tooltip" style="position:absolute;background:rgba(21,20,25,0.95);color:#fff;padding:8px;border-radius:6px;font-size:12px;pointer-events:none;display:none;z-index:100;border:1px solid rgba(255,255,255,0.1)"></div>
+    `;
+
+    attachChartInteractions({ container, view, width, margin, innerWidth, xSpan, nearest: o => visible.reduce((b, p) => Math.abs(p[0] - o) < Math.abs(b[0] - o) ? p : b, visible[0]), pointX: p => chart.x(p[0]), tooltipContent: p => `<strong>${formatBucket(p[0], timelineStart)}</strong><br>Исключено накопительно: ${number(p[1])}` });
+}
+
 function attachChartInteractions({ container, view, width, margin, innerWidth, xSpan, nearest, pointX, tooltipContent }) {
     const scroller = container.querySelector('.chart-scroller');
     const svg = container.querySelector('svg');
@@ -767,5 +833,3 @@ function attachChartInteractions({ container, view, width, margin, innerWidth, x
 
     scroller.addEventListener('scroll', () => { view.scrollLeft = scroller.scrollLeft; });
 }
-
-window.onElectionChange = onElectionChange;

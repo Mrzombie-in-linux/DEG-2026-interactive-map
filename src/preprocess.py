@@ -1,8 +1,10 @@
-import pandas as pd
-import numpy as np
+import argparse
 import json
-from datetime import datetime, timedelta
 from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 # Region name to ID mapping (from map-data.js regionNames)
 REGION_NAME_TO_ID = {
@@ -21,6 +23,7 @@ REGION_NAME_TO_ID = {
     "Чукотский автономный округ": "chukotka",
     "Республика Крым": "crimea",
     "Чувашская Республика": "chuvash",
+    "Чувашская Республика - Чувашия": "chuvash",
     "Республика Дагестан": "dagestan",
     "Донецкая Народная Республика": "donetsk",
     "Республика Ингушетия": "ingushetia",
@@ -76,9 +79,6 @@ REGION_NAME_TO_ID = {
     "Санкт-Петербург": "st-petersburg",
     "Ставропольский край": "stavropol",
     "Свердловская область": "sverdlovsk",
-    "Свердловская область - سطح": "sverdlovsk",
-    "Свердловская область - 涟": "sverdlovsk",
-    "Свердловская область -": "sverdlovsk",
     "Республика Татарстан": "tatarstan",
     "Тамбовская область": "tambov",
     "Томская область": "tomsk",
@@ -183,32 +183,43 @@ def process_election_group(group):
     }
 
 def main():
-    print("Loading merged.csv...")
-    df = pd.read_csv(
-        r'C:\Users\Rory_\Documents\DEG-2026-interactive-map\src\merged.csv',
-        encoding='utf-8',
-        parse_dates=['timestamp']
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=Path("src/merged.csv"),
+        help="path to merged.csv (region+election+voter-list events)",
     )
-    
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("src/region-timeseries.json"),
+        help="path to write the derived JSON",
+    )
+    args = parser.parse_args()
+
+    print(f"Loading {args.input}...")
+    df = pd.read_csv(args.input, encoding="utf-8", parse_dates=["timestamp"])
+
     print(f"Loaded {len(df)} rows")
     print(f"Columns: {df.columns.tolist()}")
     print(f"Unique regions: {df['region'].nunique()}")
     print(f"Unique elections: {df['election'].nunique()}")
     print(f"Types: {df['type'].unique()}")
-    
-    df = df.dropna(subset=['region', 'election'])
-    
+
+    df = df.dropna(subset=["region", "election"])
+
     result = defaultdict(lambda: defaultdict(dict))
     region_id_map = {}
-    
-    grouped = df.groupby(['region', 'election'])
+
+    grouped = df.groupby(["region", "election"])
     total_groups = len(grouped)
     print(f"\nProcessing {total_groups} region+election groups...")
-    
+
     for i, ((region, election), group) in enumerate(grouped):
         if i % 50 == 0:
             print(f"  {i}/{total_groups}...")
-        
+
         processed = process_election_group(group)
         if processed:
             region_id = REGION_NAME_TO_ID.get(region)
@@ -217,16 +228,15 @@ def main():
                 result[region_id][election] = processed
             else:
                 print(f"  Warning: No mapping for region '{region}'")
-    
+
     print(f"\nProcessed {sum(len(v) for v in result.values())} election series")
     print(f"Mapped {len(region_id_map)} regions")
-    
-    output_path = r'C:\Users\Rory_\Documents\DEG-2026-interactive-map\src\region-timeseries.json'
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(result, f, ensure_ascii=False, separators=(',', ':'))
-    
-    print(f"Saved to {output_path}")
-    
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+
+    print(f"Saved to {args.output}")
+
     sample_region = list(result.keys())[0]
     sample_election = list(result[sample_region].keys())[0]
     print(f"\nSample: {sample_region} - {sample_election}")
@@ -234,5 +244,6 @@ def main():
     print(f"  Duration: {result[sample_region][sample_election]['duration_hours']:.1f}h")
     print(f"  Total ballots: {result[sample_region][sample_election]['total_net']}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

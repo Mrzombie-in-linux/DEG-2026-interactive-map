@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Интерактивная карта РФ - Выборные статистики</title>
     <style>
+        :root {
+            --blue: #4285f4;
+            --green: #2e7d32;
+            --red: #c62828;
+            --amber: #f57c00;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #151419; min-height: 100vh; color: #e0e0e0; }
         .container { display: flex; flex-direction: column; min-height: 100vh; }
@@ -100,14 +106,14 @@
             <aside id="sidebar" class="sidebar">
                 <div class="sidebar-header">
                     <h2 id="sidebarTitle">Выберите регион</h2>
-                    <button class="sidebar-close" onclick="closeSidebar()" aria-label="Закрыть">×</button>
+                    <button class="sidebar-close" id="sidebarClose" aria-label="Закрыть">×</button>
                 </div>
                 <div class="sidebar-content">
                     <div class="sidebar-section">
                         <div class="sidebar-section-title">Выборы</div>
                         <div class="election-selector">
                             <label>Тип выборов</label>
-                            <select id="electionSelect" onchange="onElectionChange(this.value)"></select>
+                            <select id="electionSelect"></select>
                         </div>
                     </div>
                     <div class="sidebar-section">

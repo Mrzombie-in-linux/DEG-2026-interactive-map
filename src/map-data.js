@@ -91,8 +91,7 @@ const regionCodeMap = {
     "RU-YAR": "yaroslavl",
     "RU-YEV": "jewish-ao",
     "RU-ZAB": "zabaykalsky",
-    "RU-ZP": "zaporozhye",
-    "RU-KOS": "kostroma"
+    "RU-ZP": "zaporozhye"
 };
 
 const regionNames = {
